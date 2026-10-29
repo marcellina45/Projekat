@@ -1,0 +1,14 @@
+package Projekat;
+
+public class MeleeEnemy extends Enemy {
+
+	public MeleeEnemy(int x, int y, int width, int height, String type, int damage) {
+		super(x, y, width, height, type, damage);
+	}
+
+	@Override
+	public String toString() {
+		return "MeleeEnemy[" + getType() + "] @ (" + getX() + ", " + getY() + ") " + getWidth() + "x" + getHeight() + " DMG="
+				+ getDamage();
+	}
+}
