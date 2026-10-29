@@ -1,0 +1,141 @@
+package Projekat;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+public class Game {
+	private Player player;
+	private List<Enemy> enemy;
+	private List<String> dnevnik;
+	
+
+	public Game(Player player, List<Enemy> enemy, List<String> dnevnik) {
+		this.player = player;
+		this.enemy = enemy;
+		this.dnevnik = new ArrayList<>();
+	}
+
+
+
+
+	public Player getPlayer() {
+		return player;
+	}
+
+
+
+
+	public void setPlayer(Player player) {
+		this.player = player;
+	}
+
+
+
+
+	public List<Enemy> getEnemy() {
+		return enemy;
+	}
+
+
+
+
+	public void setEnemy(List<Enemy> enemy) {
+		this.enemy = enemy;
+	}
+
+
+
+
+	public List<String> getDnevnik() {
+		return dnevnik;
+	}
+
+
+
+
+	public void setDnevnik(List<String> dnevnik) {
+		this.dnevnik = dnevnik;
+	}
+
+	public boolean checkCollision(Player p, Enemy e) {
+		
+		boolean collisionX = p.getX() + p.getWidth() > e.getX() 
+				          && e.getX() + e.getWidth() > e.getX();
+		boolean collisionY = p.getY() + p.getHeight() > e.getY()
+		                  && e.getY() + e.getHeight() > p.getY();
+		                  
+		return collisionX && collisionY;
+	}
+	
+	public int decreaseHealth(Player p, Enemy e) {
+		int newHealth = p.getHealth() - e.getDamage();
+		
+		if(newHealth <= 0) {
+			newHealth = 0;
+			System.out.println("Igrač umire");
+		}
+		/* "HIT: Player by Goblin for 20 -> HP 85-> 65" */
+		String poruka = "HIT:" + p.getName() + " by " + e.getType() + " for " 
+				+ e.getDamage() + " -> HP " + p.getHealth() + " -> " + newHealth;
+		dnevnik.add(poruka);
+		
+		return newHealth;
+	}
+	
+	public void addEnemy(Enemy e) {
+		enemy.add(e);
+		
+		dnevnik.add("Novi neprijatelj je " + e.getType());
+	}
+	
+	public List<Enemy> collidingWithPlayer(){
+		List<Enemy> sudaraju = new ArrayList<>();
+		
+		for (int i = 0; i < enemy.size(); i++) {
+			Enemy e = enemy.get(i);
+			
+			if(checkCollision(player,e)) {
+				sudaraju.add(e);
+			}
+		}
+			return sudaraju;
+		}
+	
+	public void resolveCollisions() {
+		for (int i = 0; i < enemy.size(); i++) {
+			Enemy e = enemy.get(i);
+			
+			if(checkCollision(player,e)) {
+				decreaseHealth(player,e);
+			}
+		}
+	}
+
+	public static void main(String[] args) {
+		Player player = new Player(3, 5, 8, 9,"mare  opp", 50);
+		
+		Game game = new Game(player,new ArrayList<>(), new ArrayList<>());
+		
+		MeleeEnemy rucno = new MeleeEnemy(4, 2, 5, 4,"Goblin", 20);
+		game.addEnemy(rucno);
+		
+		String input = "Goblin;12,5;16x16;20";
+		String[] djelovi = input.split(";");
+		
+		String type = djelovi[0];
+		
+		String[] kordinate = djelovi[1].split(",");
+			int x = Integer.parseInt(kordinate[0]);
+			int y = Integer.parseInt(kordinate[1]);
+			
+		String[] dimenzije =  djelovi[2].split("x");
+		    int width = Integer.parseInt(dimenzije[0]);
+		    int height = Integer.parseInt(dimenzije[1]);
+		    
+		    int damage = Integer.parseInt(djelovi[3]);
+		    
+		Enemy citanje = new Enemy(x, y, width, height,type, damage);
+		game.addEnemy(citanje);
+		}
+	}
